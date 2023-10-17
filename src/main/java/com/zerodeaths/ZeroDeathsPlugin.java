@@ -133,17 +133,16 @@ public class ZeroDeathsPlugin extends Plugin
 				.url(apiURL)
 				.post(RequestBody.create(null, new byte[0]))
 				.build();
-		
+
 		okHttpClient.newCall(request).enqueue(new Callback() {
 			@Override
 			public void onFailure(@Nullable  Call call, @Nullable  IOException e) {
-
+				//Do nothing
 			}
 
 			@Override
 			public void onResponse(@Nullable Call call, @Nullable Response response) throws IOException {
-                assert response != null;
-
+				//Do nothing
 			}
 		});
 	}
