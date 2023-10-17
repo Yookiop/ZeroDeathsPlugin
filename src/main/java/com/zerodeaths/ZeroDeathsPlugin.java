@@ -133,19 +133,17 @@ public class ZeroDeathsPlugin extends Plugin
 				.url(apiURL)
 				.post(RequestBody.create(null, new byte[0]))
 				.build();
-
-		String finalApiURL = apiURL;
+		
 		okHttpClient.newCall(request).enqueue(new Callback() {
 			@Override
 			public void onFailure(@Nullable  Call call, @Nullable  IOException e) {
-				log.debug("API Call failed");
+
 			}
 
 			@Override
 			public void onResponse(@Nullable Call call, @Nullable Response response) throws IOException {
                 assert response != null;
-				log.debug("api" + finalApiURL);
-                log.debug("API Call successful" + response.code());
+
 			}
 		});
 	}
