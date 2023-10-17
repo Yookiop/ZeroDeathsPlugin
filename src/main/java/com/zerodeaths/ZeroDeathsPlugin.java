@@ -14,14 +14,15 @@ import net.runelite.client.plugins.PluginDescriptor;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import okhttp3.*;
+import javax.annotation.Nullable;
 
 @Slf4j
 @PluginDescriptor(
@@ -38,16 +39,19 @@ public class ZeroDeathsPlugin extends Plugin
 	private Boolean playerIsDead = false;
 	private Boolean scoring = false;
 	private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+	@Inject
+	private OkHttpClient okHttpClient;
 
 	@Override
 	protected void startUp() throws Exception
 	{
-
+		configManager.setConfiguration("player", "registered", "false");
 	}
 
 	@Override
 	protected void shutDown() throws Exception
 	{
+		playerIsDead = true;
 		callApi("died");
 	}
 
@@ -88,10 +92,10 @@ public class ZeroDeathsPlugin extends Plugin
 
 			if (currentHP <= 0) {
 				if(!playerIsDead) {
-					callApi("died");
 					playerIsDead = true;
 				}
 			} else {
+				callApi("died");
 				playerIsDead = false;
 			}
 		}
@@ -105,33 +109,45 @@ public class ZeroDeathsPlugin extends Plugin
 		}
 
 		String apiURL = null;
-        switch (parameter) {
-            case "died":
-                apiURL = "https://r7zzw8jrpg.execute-api.eu-west-1.amazonaws.com/dev/addUserDetails?username=" + username + "&died=true";
-                break;
-            case "score":
-                apiURL = "https://r7zzw8jrpg.execute-api.eu-west-1.amazonaws.com/dev/compareAndScore?username=" + username;
-                break;
-            case "add":
-                apiURL = "https://r7zzw8jrpg.execute-api.eu-west-1.amazonaws.com/dev/addUserDetails?username=" + username;
+		switch (parameter) {
+			case "died":
+				apiURL = "https://r7zzw8jrpg.execute-api.eu-west-1.amazonaws.com/dev/addUserDetails?username=" + username + "&died=true";
+				break;
+			case "score":
+				apiURL = "https://r7zzw8jrpg.execute-api.eu-west-1.amazonaws.com/dev/compareAndScore?username=" + username;
+				break;
+			case "add":
+				apiURL = "https://r7zzw8jrpg.execute-api.eu-west-1.amazonaws.com/dev/addUserDetails?username=" + username;
 				configManager.setConfiguration("player", "registered", "true");
-                break;
-        }
-
-		try
-		{
-            assert apiURL != null;
-            URL url = new URL(apiURL);
-
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-			// Set the request method to POST or GET, depending on your API
-			connection.setRequestMethod("POST"); // Change to "GET" if needed
+				break;
 		}
-		catch (IOException e)
-		{
-			throw new RuntimeException("Error calling API");
-		}
+
+        assert apiURL != null;
+
+		RequestBody requestBody = new FormBody.Builder()
+				.add("param1", "value1") // Add your POST data here
+				.add("param2", "value2")
+				.build();
+
+        Request request = new Request.Builder()
+				.url(apiURL)
+				.post(RequestBody.create(null, new byte[0]))
+				.build();
+
+		String finalApiURL = apiURL;
+		okHttpClient.newCall(request).enqueue(new Callback() {
+			@Override
+			public void onFailure(@Nullable  Call call, @Nullable  IOException e) {
+				log.debug("API Call failed");
+			}
+
+			@Override
+			public void onResponse(@Nullable Call call, @Nullable Response response) throws IOException {
+                assert response != null;
+				log.debug("api" + finalApiURL);
+                log.debug("API Call successful" + response.code());
+			}
+		});
 	}
 
 	@Provides
