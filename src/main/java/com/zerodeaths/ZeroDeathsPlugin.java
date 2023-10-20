@@ -88,8 +88,6 @@ public class ZeroDeathsPlugin extends Plugin
 		if (client.getGameState() == GameState.LOGGED_IN) {
 			int currentHP = client.getBoostedSkillLevel(Skill.HITPOINTS);
 
-			log.info("died" + currentHP);
-
 			if (currentHP <= 0) {
 				if(!playerIsDead) {
 					playerIsDead = true;
