@@ -51,8 +51,6 @@ public class ZeroDeathsPlugin extends Plugin
 	@Override
 	protected void shutDown() throws Exception
 	{
-		playerIsDead = true;
-		callApi("died");
 	}
 
 	@Subscribe
@@ -90,12 +88,14 @@ public class ZeroDeathsPlugin extends Plugin
 		if (client.getGameState() == GameState.LOGGED_IN) {
 			int currentHP = client.getBoostedSkillLevel(Skill.HITPOINTS);
 
+			log.info("died" + currentHP);
+
 			if (currentHP <= 0) {
 				if(!playerIsDead) {
 					playerIsDead = true;
+					callApi("died");
 				}
 			} else {
-				callApi("died");
 				playerIsDead = false;
 			}
 		}
