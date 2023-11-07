@@ -51,6 +51,7 @@ public class ZeroDeathsPlugin extends Plugin
 	@Override
 	protected void shutDown() throws Exception
 	{
+		callApi("died");
 	}
 
 	@Subscribe
@@ -109,13 +110,13 @@ public class ZeroDeathsPlugin extends Plugin
 		String apiURL = null;
 		switch (parameter) {
 			case "died":
-				apiURL = "https://r7zzw8jrpg.execute-api.eu-west-1.amazonaws.com/dev/addUserDetails?username=" + username + "&died=true";
+				apiURL = "https://nydiwq3xz0.execute-api.eu-west-1.amazonaws.com/dev/addUserDetails?username=" + username + "&died=true";
 				break;
 			case "score":
-				apiURL = "https://r7zzw8jrpg.execute-api.eu-west-1.amazonaws.com/dev/compareAndScore?username=" + username;
+				apiURL = "https://nydiwq3xz0.execute-api.eu-west-1.amazonaws.com/dev/compareAndScore?username=" + username;
 				break;
 			case "add":
-				apiURL = "https://r7zzw8jrpg.execute-api.eu-west-1.amazonaws.com/dev/addUserDetails?username=" + username;
+				apiURL = "https://nydiwq3xz0.execute-api.eu-west-1.amazonaws.com/dev/addUserDetails?username=" + username;
 				configManager.setConfiguration("player", "registered", "true");
 				break;
 		}
